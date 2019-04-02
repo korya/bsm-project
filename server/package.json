@@ -1,0 +1,25 @@
+{
+  "name": "sudoku-server",
+  "version": "1.0.0",
+  "description": "Sudoku server, the solution for Level 1",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "npm run test:unit && npm run test:acceptance",
+    "test:unit": "jest ./src",
+    "test:acceptance": "jest ./api-test"
+  },
+  "author": "korya <korya.github@gmail.com> (https://github.com/korya)",
+  "license": "ISC",
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "axios": "^0.18.0",
+    "jest": "^24.5.0",
+    "jest-cli": "^24.5.0"
+  }
+}
