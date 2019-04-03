@@ -1,0 +1,45 @@
+/* Based on https://codepen.io/artemisart/pen/NNErXO */
+
+div.sudoku-board-empty {
+  width: 386px;
+  height: 386px;
+  border: 1px solid black;
+  margin: 20px auto;
+  background-color: #d6d6d6;
+}
+
+table.sudoku-board {
+  margin: 20px auto;
+  border-collapse: collapse;
+}
+
+table.sudoku-board tr:first-child td {
+  border-top-color: black;
+}
+
+table.sudoku-board tr:nth-child(3n) td {
+  border-bottom-color: black;
+}
+
+table.sudoku-board td {
+  border: 1px solid lightgrey;
+  height: 40px;
+  width: 40px;
+}
+
+table.sudoku-board td:first-child {
+  border-left-color: black;
+}
+
+table.sudoku-board td:nth-child(3n) {
+  border-right-color: black;
+}
+
+table.sudoku-board td span {
+  padding: 0;
+  text-align: center;
+  border: 0;
+  height: 40px;
+  width: 40px;
+  text-align: center;
+}

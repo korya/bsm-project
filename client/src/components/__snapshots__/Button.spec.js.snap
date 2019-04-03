@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders children correctly 1`] = `"<button class=\\"button\\"></button>"`;
+
+exports[`renders correctly 1`] = `
+<button
+  className="button"
+/>
+`;
+
+exports[`renders correctly 2`] = `
+<button
+  className="button"
+  onClick={[Function]}
+>
+  Label
+</button>
+`;

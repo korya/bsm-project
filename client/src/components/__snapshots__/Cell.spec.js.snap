@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<td>
+  <span>
+    1
+  </span>
+</td>
+`;
+
+exports[`renders correctly 2`] = `
+<td>
+  <span>
+    9
+  </span>
+</td>
+`;
