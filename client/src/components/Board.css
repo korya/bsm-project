@@ -35,11 +35,21 @@ table.sudoku-board td:nth-child(3n) {
   border-right-color: black;
 }
 
-table.sudoku-board td span {
+table.sudoku-board td button {
   padding: 0;
   text-align: center;
   border: 0;
   height: 40px;
   width: 40px;
   text-align: center;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+table.sudoku-board td button.selected {
+  background-color: rgba(114, 221, 253, 0.63);
+}
+
+table.sudoku-board td button:focus {
+  outline: 0;
 }

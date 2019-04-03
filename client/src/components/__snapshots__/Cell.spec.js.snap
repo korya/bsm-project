@@ -2,16 +2,30 @@
 
 exports[`renders correctly 1`] = `
 <td>
-  <span>
+  <button
+    className=""
+  >
     1
-  </span>
+  </button>
 </td>
 `;
 
 exports[`renders correctly 2`] = `
 <td>
-  <span>
+  <button
+    className=""
+  >
     9
-  </span>
+  </button>
+</td>
+`;
+
+exports[`renders correctly 3`] = `
+<td>
+  <button
+    className="selected"
+  >
+    7
+  </button>
 </td>
 `;

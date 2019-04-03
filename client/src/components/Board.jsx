@@ -2,7 +2,7 @@ import React from 'react';
 import Cell from './Cell';
 import './Board.css';
 
-export default function Board({ board }) {
+export default function Board({ board, selected, onCellClick }) {
   return (
     <table className="sudoku-board">
       <tbody>
@@ -12,7 +12,14 @@ export default function Board({ board }) {
               {
                 seq(9).map(j => {
                   const idx = i * 9 + j;
-                  return <Cell key={idx} number={board[idx]} />;
+                  return (
+                    <Cell
+                      key={idx}
+                      number={board[idx]}
+                      selected={selected[idx]}
+                      onClick={() => onCellClick(idx)}
+                    />
+                  );
                 })
               }
             </tr>

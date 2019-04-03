@@ -1,7 +1,16 @@
 import React from 'react';
 
-export default function Cell({ number }) {
+export default function Cell({ number, selected, onClick }) {
+  const className = selected ? 'selected' : '';
+
   return (
-    <td><span>{number}</span></td>
+    <td>
+      <button
+        className={className}
+        onClick={onClick}
+      >
+        {number}
+      </button>
+    </td>
   );
 }

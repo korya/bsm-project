@@ -5,6 +5,7 @@ import App from './App';
 import Board from './components/Board';
 import BoardSpinner from './components/BoardSpinner';
 import Button from './components/Button';
+import Cell from './components/Cell';
 
 describe('initial load', () => {
   let wrapper = null;
@@ -47,6 +48,12 @@ describe('initial load', () => {
     expect(wrapper.exists(Board)).toEqual(true);
     expect(wrapper.find(Board).prop('board')).toEqual([1, 2]);
   });
+
+  test('no selected cells', () => {
+    expect(
+      wrapper.find(Cell).find({ selected: true }).exists(),
+    ).toEqual(false);
+  });
 });
 
 describe('Reload button', () => {
@@ -81,9 +88,9 @@ describe('Reload button', () => {
     expect(wrapper.exists(BoardSpinner)).toEqual(false);
     expect(wrapper.exists(Board)).toEqual(true);
     expect(wrapper.find(Board).prop('board')).toEqual([1, 2]);
-  });
-
-  test('', () => {
+    expect(
+      wrapper.find(Cell).find({ selected: true }).exists(),
+    ).toEqual(false);
   });
 
   test('reloads the board when Reload is clicked', () => {
@@ -111,5 +118,85 @@ describe('Reload button', () => {
     expect(wrapper.exists(BoardSpinner)).toEqual(false);
     expect(wrapper.exists(Board)).toEqual(true);
     expect(wrapper.find(Board).prop('board')).toEqual([3, 4, 5]);
+    expect(
+      wrapper.find(Cell).find({ selected: true }).exists(),
+    ).toEqual(false);
+  });
+});
+
+describe('select cells', () => {
+  let wrapper = null;
+
+  beforeAll(() => {
+    jest.spyOn(global, 'fetch')
+      .mockImplementationOnce(() => ({
+        then: () => ({
+          then: cb => {
+            cb([1, 2, 3, 4, 5]);
+          },
+        }),
+      }));
+    wrapper = mount(<App />);
+  });
+  afterAll(() => {
+    global.fetch.mockClear();
+  });
+
+  test('initial board is loaded', () => {
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledWith('/sudoku/board');
+    expect(wrapper.exists(BoardSpinner)).toEqual(false);
+    expect(wrapper.exists(Board)).toEqual(true);
+    expect(wrapper.find(Board).prop('board')).toEqual([1, 2, 3, 4, 5]);
+    expect(
+      wrapper.find(Cell).find({ selected: true }).exists(),
+    ).toEqual(false);
+  });
+
+  test('selected cell is highlighted', () => {
+    act(() => {
+      wrapper.find(Cell).find({ number: 4 }).find('button').simulate('click');
+    });
+    // XXX It seems to be a bug in enzyme, after useEffect() is finished
+    // the HTML code is updated but the ReactWrapper is not.
+    // So I have to manually re-render it in order to sync both.
+    wrapper.update();
+    const selectedCells = wrapper.find(Cell).find({ selected: true });
+    expect(selectedCells.exists()).toEqual(true);
+    expect(selectedCells.map(n => n.prop('number'))).toEqual([4])
+  });
+
+  test('multiple selected cells are highlighted', () => {
+    act(() => {
+      wrapper.find(Cell).find({ number: 1 }).find('button').simulate('click');
+    });
+    // XXX It seems to be a bug in enzyme, after useEffect() is finished
+    // the HTML code is updated but the ReactWrapper is not.
+    // So I have to manually re-render it in order to sync both.
+    wrapper.update();
+    const selectedCells = wrapper.find(Cell).find({ selected: true });
+    expect(selectedCells.exists()).toEqual(true);
+    expect(selectedCells.map(n => n.prop('number'))).toEqual([1, 4])
+  });
+
+  test('unselected cell is not highlighted', () => {
+    act(() => {
+      wrapper.find(Cell).find({ number: 4 }).find('button').simulate('click');
+    });
+    // XXX It seems to be a bug in enzyme, after useEffect() is finished
+    // the HTML code is updated but the ReactWrapper is not.
+    // So I have to manually re-render it in order to sync both.
+    wrapper.update();
+    const selectedCells = wrapper.find(Cell).find({ selected: true });
+    expect(selectedCells.exists()).toEqual(true);
+    expect(selectedCells.map(n => n.prop('number'))).toEqual([1])
+  });
+
+  test('board is not refreshed', () => {
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledWith('/sudoku/board');
+    expect(wrapper.exists(BoardSpinner)).toEqual(false);
+    expect(wrapper.exists(Board)).toEqual(true);
+    expect(wrapper.find(Board).prop('board')).toEqual([1, 2, 3, 4, 5]);
   });
 });

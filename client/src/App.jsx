@@ -7,6 +7,7 @@ import './App.css';
 export default function App() {
   const [requested, setRequested] = useState(1);
   const [board, setBoard] = useState(null);
+  const [selected, setSelected] = useState(new Array(81).fill(false));
 
   useEffect(() => {
     setBoard(null);
@@ -18,7 +19,18 @@ export default function App() {
   return (
     <div className="App">
       <h1>Sudoku</h1>
-      {board ? <Board board={board}/> : <BoardSpinner />}
+      {board ?
+        <Board
+          board={board}
+          selected={selected}
+          onCellClick={idx => {
+            const newSelected = selected.slice();
+            newSelected[idx] = !newSelected[idx];
+            setSelected(newSelected);
+          }}
+        /> :
+        <BoardSpinner />
+      }
       <Button onClick={() => setRequested(requested + 1)}>Reload</Button>
     </div>
   );
