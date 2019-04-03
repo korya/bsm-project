@@ -1,0 +1,17 @@
+{
+  "name": "bsm-take-home-project",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "npm run build --prefix client",
+    "start": "concurrently -k --names SERVER,CLIENT -c 'yellow,magenta' 'npm run start:server' 'npm run start:client'",
+    "start:server": "npm run start --prefix server",
+    "start:client": "npm start --prefix client",
+    "test": "npm run test --prefix server && npm run test --prefix client"
+  },
+  "author": "korya <korya.github@gmail.com> (https://github.com/korya)",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^4.1.0"
+  }
+}

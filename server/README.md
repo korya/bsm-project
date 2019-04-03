@@ -9,6 +9,10 @@ Used technologies:
 The source code is located in `src/` directory. `api-test/` directory includes
 the acceptance tests.
 
+## Available Scripts
+
+In the project directory, you can run:
+
 ### Run the server
 
 ```sh
