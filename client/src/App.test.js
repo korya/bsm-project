@@ -33,7 +33,7 @@ describe('initial load', () => {
 
   test('attempts to load a board on initial load', () => {
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith('/sudoku/board');
+    expect(global.fetch).toHaveBeenLastCalledWith('/sudoku/board?board=');
   });
 
   test('display the board when loaded', () => {
@@ -84,7 +84,7 @@ describe('Reload button', () => {
 
   test('initial board is loaded', () => {
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith('/sudoku/board');
+    expect(global.fetch).toHaveBeenLastCalledWith('/sudoku/board?board=');
     expect(wrapper.exists(BoardSpinner)).toEqual(false);
     expect(wrapper.exists(Board)).toEqual(true);
     expect(wrapper.find(Board).prop('board')).toEqual([1, 2]);
@@ -102,7 +102,7 @@ describe('Reload button', () => {
     // So I have to manually re-render it in order to sync both.
     wrapper.update();
     expect(global.fetch).toHaveBeenCalledTimes(2);
-    expect(global.fetch).toHaveBeenCalledWith('/sudoku/board');
+    expect(global.fetch).toHaveBeenLastCalledWith('/sudoku/board?board=');
     expect(wrapper.exists(BoardSpinner)).toEqual(true);
     expect(wrapper.exists(Board)).toEqual(false);
   });
@@ -144,7 +144,7 @@ describe('select cells', () => {
 
   test('initial board is loaded', () => {
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith('/sudoku/board');
+    expect(global.fetch).toHaveBeenLastCalledWith('/sudoku/board?board=');
     expect(wrapper.exists(BoardSpinner)).toEqual(false);
     expect(wrapper.exists(Board)).toEqual(true);
     expect(wrapper.find(Board).prop('board')).toEqual([1, 2, 3, 4, 5]);
@@ -194,9 +194,96 @@ describe('select cells', () => {
 
   test('board is not refreshed', () => {
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(global.fetch).toHaveBeenCalledWith('/sudoku/board');
+    expect(global.fetch).toHaveBeenLastCalledWith('/sudoku/board?board=');
     expect(wrapper.exists(BoardSpinner)).toEqual(false);
     expect(wrapper.exists(Board)).toEqual(true);
     expect(wrapper.find(Board).prop('board')).toEqual([1, 2, 3, 4, 5]);
   });
 });
+
+describe('Reload button with selected cells', () => {
+  let wrapper = null;
+  let resolveBoard = null;
+
+  beforeAll(() => {
+    jest.spyOn(global, 'fetch')
+      .mockImplementationOnce(() => ({
+        then: () => ({
+          then: cb => {
+            cb([1, 2, 3, 4, 5]);
+          },
+        }),
+      }))
+      .mockImplementation(() => ({
+        then: () => ({
+          then: cb => {
+            resolveBoard = cb;
+          },
+        }),
+      }));
+    wrapper = mount(<App />);
+  });
+  afterAll(() => {
+    global.fetch.mockClear();
+  });
+
+  test('initial board is loaded', () => {
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenLastCalledWith('/sudoku/board?board=');
+    expect(wrapper.exists(BoardSpinner)).toEqual(false);
+    expect(wrapper.exists(Board)).toEqual(true);
+    expect(wrapper.find(Board).prop('board')).toEqual([1, 2, 3, 4, 5]);
+    expect(
+      wrapper.find(Cell).find({ selected: true }).exists(),
+    ).toEqual(false);
+  });
+
+  test('selected cells are highlighted', () => {
+    act(() => {
+      wrapper.find(Cell).find({ number: 3 }).find('button').simulate('click');
+    });
+    act(() => {
+      wrapper.find(Cell).find({ number: 4 }).find('button').simulate('click');
+    });
+    // XXX It seems to be a bug in enzyme, after useEffect() is finished
+    // the HTML code is updated but the ReactWrapper is not.
+    // So I have to manually re-render it in order to sync both.
+    wrapper.update();
+    const selectedCells = wrapper.find(Cell).find({ selected: true });
+    expect(selectedCells.exists()).toEqual(true);
+    expect(selectedCells.map(n => n.prop('number'))).toEqual([3, 4])
+  });
+
+  test('reloads the board fixing selected cells', () => {
+    act(() => {
+      wrapper.find(Button).simulate('click');
+    });
+    // XXX It seems to be a bug in enzyme, after useEffect() is finished
+    // the HTML code is updated but the ReactWrapper is not.
+    // So I have to manually re-render it in order to sync both.
+    wrapper.update();
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(global.fetch).toHaveBeenLastCalledWith(
+      '/sudoku/board?board=00340'
+    );
+    expect(wrapper.exists(BoardSpinner)).toEqual(true);
+    expect(wrapper.exists(Board)).toEqual(false);
+  });
+
+  test('refreshes the board, selected cells are unchanged', async () => {
+    act(() => {
+      resolveBoard([5, 1, 3, 4, 2]);
+    });
+    // XXX It seems to be a bug in enzyme, after useEffect() is finished
+    // the HTML code is updated but the ReactWrapper is not.
+    // So I have to manually re-render it in order to sync both.
+    wrapper.update();
+    expect(wrapper.exists(BoardSpinner)).toEqual(false);
+    expect(wrapper.exists(Board)).toEqual(true);
+    expect(wrapper.find(Board).prop('board')).toEqual([5, 1, 3, 4, 2]);
+    const selectedCells = wrapper.find(Cell).find({ selected: true });
+    expect(selectedCells.exists()).toEqual(true);
+    expect(selectedCells.map(n => n.prop('number'))).toEqual([3, 4])
+  });
+});
+

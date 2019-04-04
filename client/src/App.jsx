@@ -10,8 +10,11 @@ export default function App() {
   const [selected, setSelected] = useState(new Array(81).fill(false));
 
   useEffect(() => {
+    const b = !board || selected.every(v => !v) ? '' :
+      board.map((n, idx) => selected[idx] ? n : 0).join('');
+
     setBoard(null);
-    fetch('/sudoku/board')
+    fetch(`/sudoku/board?board=${b}`)
       .then(res => res.json())
       .then(board => setBoard(board));
   }, [requested]);
