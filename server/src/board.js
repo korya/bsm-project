@@ -1,31 +1,25 @@
 const { maskSet, maskGet } = require('./utils');
 
-/* Board is array consisting of 81 integers.
- *
- */
+const createEmptyBoard = () => new Array(81).fill(0);
 
-const emptyBoard = () => {
-  return Array.from({ length: 81 }).map(() => 0);
-};
-
-const isValidBoard = board => {
+const boardIsSolved = board => {
   if (!Array.isArray(board) || board.length !== 81) {
     return false;
   }
 
   for (let i = 0; i < 9; i++) {
-    if (!segmentIsValid(board, iterateRow(i))) {
+    if (!segmentIsSolved(board, iterateRow(i))) {
       return false;
     }
 
-    if (!segmentIsValid(board, iterateCol(i))) {
+    if (!segmentIsSolved(board, iterateCol(i))) {
       return false;
     }
   }
 
   for (let i = 0; i < 9; i += 3) {
     for (let j = 0; j < 9; j += 3) {
-      if (!segmentIsValid(board, iterateBox([ i, j ]))) {
+      if (!segmentIsSolved(board, iterateBox([ i, j ]))) {
         return false;
       }
     }
@@ -56,7 +50,7 @@ const segmentsHasDups = (board, iterator) => {
   return false;
 };
 
-const segmentIsValid = (board, iterator) => {
+const segmentIsSolved = (board, iterator) => {
   let sum = 0;
   let mask = 0;
   for (const idx of iterator) {
@@ -108,12 +102,12 @@ const getPosForIdx = idx => {
 };
 
 module.exports = {
-  emptyBoard,
-  isValidBoard,
+  createEmptyBoard,
+  boardIsSolved,
   hasConflictsAt,
   getPosForIdx,
   segmentsHasDups,
-  segmentIsValid,
+  segmentIsSolved,
   iterateRow,
   iterateCol,
   iterateBox,

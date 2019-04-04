@@ -1,7 +1,8 @@
 const {
-  isValidBoard,
+  createEmptyBoard,
+  boardIsSolved,
   segmentsHasDups,
-  segmentIsValid,
+  segmentIsSolved,
   getPosForIdx,
   iterateRow,
   iterateCol,
@@ -119,14 +120,14 @@ describe('segmentsHasDups', () => {
   });
 });
 
-describe('segmentIsValid', () => {
+describe('segmentIsSolved', () => {
   test('empty board', () => {
     const emptyBoard = Array.from({ length: 81 }).map(() => 0);
     const firstRow = Array.from({ length: 9 }).map((_, idx) => idx);
     const thirdCol = Array.from({ length: 9 }).map((_, idx) => 2 + idx * 9);
 
-    expect(segmentIsValid(emptyBoard, firstRow)).toEqual(false);
-    expect(segmentIsValid(emptyBoard, thirdCol)).toEqual(false);
+    expect(segmentIsSolved(emptyBoard, firstRow)).toEqual(false);
+    expect(segmentIsSolved(emptyBoard, thirdCol)).toEqual(false);
   });
 
   const sampleBoard = [
@@ -134,106 +135,70 @@ describe('segmentIsValid', () => {
     4, 5, 6,   7, 8, 9,   1, 0, 3,
     7, 8, 9,   1, 2, 1,   2, 0, 4,
   ];
-  const validRowSegment = [0, 1, 2, 3, 4, 5, 6, 7, 8]; // first row
-  const validBoxSegment = [0, 1, 2, 9, 10, 11, 18, 19, 20]; // first box
+  const solvedRowSegment = [0, 1, 2, 3, 4, 5, 6, 7, 8]; // first row
+  const solvedBoxSegment = [0, 1, 2, 9, 10, 11, 18, 19, 20]; // first box
   const dupBoxSegment = [3, 4, 5, 12, 13, 14, 21, 22, 23]; // second box
   const partialRowSegment = [9, 10, 11, 12, 13, 14, 15, 16, 17]; // second row
   const partialBoxSegment = [6, 7, 8, 15, 16, 17, 24, 25, 26]; // third box
   const invalidRowSegment = [18, 19, 20, 21, 22, 23, 24, 25, 26]; // third row
 
-  test('valid', () => {
-    expect(segmentIsValid(sampleBoard, validRowSegment)).toEqual(true);
-    expect(segmentIsValid(sampleBoard, validBoxSegment)).toEqual(true);
+  test('solved', () => {
+    expect(segmentIsSolved(sampleBoard, solvedRowSegment)).toEqual(true);
+    expect(segmentIsSolved(sampleBoard, solvedBoxSegment)).toEqual(true);
   });
 
   test('duplicates', () => {
-    expect(segmentIsValid(sampleBoard, dupBoxSegment)).toEqual(false);
+    expect(segmentIsSolved(sampleBoard, dupBoxSegment)).toEqual(false);
   });
 
   test('missing cells', () => {
-    expect(segmentIsValid(sampleBoard, partialRowSegment)).toEqual(false);
-    expect(segmentIsValid(sampleBoard, partialBoxSegment)).toEqual(false);
+    expect(segmentIsSolved(sampleBoard, partialRowSegment)).toEqual(false);
+    expect(segmentIsSolved(sampleBoard, partialBoxSegment)).toEqual(false);
   });
 
-  test('invalid', () => {
-    expect(segmentIsValid(sampleBoard, invalidRowSegment)).toEqual(false);
-    expect(segmentIsValid(sampleBoard, [1, 2, 3])).toEqual(false);
+  test('not solved', () => {
+    expect(segmentIsSolved(sampleBoard, invalidRowSegment)).toEqual(false);
+    expect(segmentIsSolved(sampleBoard, [1, 2, 3])).toEqual(false);
   });
 });
 
-describe('isValidBoard', () => {
-  const trivialBoard = [1,2,3,4,5,6,7,8,9,4,5,6,7,8,9,1,2,3,7,8,9,1,2,3,4,5,6,2,1,4,3,6,5,8,9,7,3,6,5,8,9,7,2,1,4,8,9,7,2,1,4,3,6,5,5,3,1,6,4,2,9,7,8,6,4,2,9,7,8,5,3,1,9,7,8,5,3,1,6,4,2];
-
-  describe('valid', () => {
-    const validBoards = [
-      [
-        'trivial',
-        trivialBoard,
-      ],
-      [
-        'one',
-        [3,2,5,7,1,8,6,4,9,1,4,8,3,6,9,2,7,5,9,6,7,2,5,4,3,1,8,6,1,4,5,8,2,9,3,7,7,3,2,4,9,1,8,5,6,8,5,9,6,3,7,1,2,4,5,8,1,9,7,3,4,6,2,4,9,6,1,2,5,7,8,3,2,7,3,8,4,6,5,9,1],
-      ],
-      [
-        'two',
-        [8,2,4,1,6,3,5,7,9,1,5,6,8,9,7,4,2,3,3,7,9,2,4,5,8,6,1,6,9,5,3,8,1,2,4,7,2,8,1,4,7,6,9,3,5,4,3,7,5,2,9,1,8,6,7,1,8,9,3,2,6,5,4,5,6,2,7,1,4,3,9,8,9,4,3,6,5,8,7,1,2],
-      ],
-      [
-        'three',
-        [6,5,1,2,9,8,4,7,3,3,7,2,4,6,1,9,8,5,4,9,8,7,3,5,6,2,1,1,6,3,8,2,7,5,4,9,2,8,5,6,4,9,1,3,7,9,4,7,5,1,3,2,6,8,8,1,4,9,7,2,3,5,6,5,2,9,3,8,6,7,1,4,7,3,6,1,5,4,8,9,2],
-      ],
-    ];
-
-    test.each(validBoards)('valid: %s', (name, board) => {
-      expect(isValidBoard(board)).toEqual(true);
+describe('boardIsSolved', () => {
+  describe('solved', () => {
+    test.each(getValidBoards())('solved: %s', (name, board) => {
+      expect(boardIsSolved(board)).toEqual(true);
     });
   });
 
-  describe('invalid', () => {
+  describe('not solved', () => {
     test('missing value', () => {
-      const b = trivialBoard.slice();
-      expect(isValidBoard(b)).toEqual(true);
+      const b = getTrivialBoard();
+      expect(boardIsSolved(b)).toEqual(true);
       b[53] = 0;
-      expect(isValidBoard(b)).toEqual(false);
+      expect(boardIsSolved(b)).toEqual(false);
     });
 
     test('row dups', () => {
-      const b = trivialBoard.slice();
-      expect(isValidBoard(b)).toEqual(true);
+      const b = getTrivialBoard();
+      expect(boardIsSolved(b)).toEqual(true);
       b[0] = b[1];
-      expect(isValidBoard(b)).toEqual(false);
+      expect(boardIsSolved(b)).toEqual(false);
     });
 
     test('col dups', () => {
-      const b = trivialBoard.slice();
-      expect(isValidBoard(b)).toEqual(true);
+      const b = getTrivialBoard();
+      expect(boardIsSolved(b)).toEqual(true);
       b[80] = b[71];
-      expect(isValidBoard(b)).toEqual(false);
+      expect(boardIsSolved(b)).toEqual(false);
     });
 
     test('invalid box', () => {
-      const b = trivialBoard.slice();
-      expect(isValidBoard(b)).toEqual(true);
+      const b = getTrivialBoard();
+      expect(boardIsSolved(b)).toEqual(true);
       // swap 3rd row and 4th row
       for (let idx = 18; idx < 27; idx++) {
         [b[idx], b[idx + 9]] = [b[idx + 9], b[idx]];
       }
-      expect(isValidBoard(b)).toEqual(false);
-    });
-
-    test('empty board', () => {
-      expect(isValidBoard([])).toEqual(false);
-    });
-
-    test('partial board', () => {
-      const b = trivialBoard.slice(0, 75);
-      expect(isValidBoard(b)).toEqual(false);
-    });
-
-    test('too big board', () => {
-      const b = trivialBoard.slice();
-      b.push(0);
-      expect(isValidBoard(b)).toEqual(false);
+      expect(boardIsSolved(b)).toEqual(false);
     });
   });
 
@@ -247,10 +212,48 @@ describe('isValidBoard', () => {
       2.3,
       {},
       { length: 81 },
+      [],
+      getTrivialBoard().slice(0, 75),
+      [...getTrivialBoard(), ...[0]],
     ];
 
     test.each(cases)('%s', val => {
-      expect(isValidBoard(val)).toEqual(false);
+      expect(boardIsSolved(val)).toEqual(false);
     });
   });
 });
+
+function getTrivialBoard() {
+  return [
+    1,2,3,4,5,6,7,8,9,
+    4,5,6,7,8,9,1,2,3,
+    7,8,9,1,2,3,4,5,6,
+    2,1,4,3,6,5,8,9,7,
+    3,6,5,8,9,7,2,1,4,
+    8,9,7,2,1,4,3,6,5,
+    5,3,1,6,4,2,9,7,8,
+    6,4,2,9,7,8,5,3,1,
+    9,7,8,5,3,1,6,4,2,
+  ];
+}
+
+function getValidBoards() {
+  return [
+    [
+      'trivial',
+      getTrivialBoard(),
+    ],
+    [
+      'one',
+      [3,2,5,7,1,8,6,4,9,1,4,8,3,6,9,2,7,5,9,6,7,2,5,4,3,1,8,6,1,4,5,8,2,9,3,7,7,3,2,4,9,1,8,5,6,8,5,9,6,3,7,1,2,4,5,8,1,9,7,3,4,6,2,4,9,6,1,2,5,7,8,3,2,7,3,8,4,6,5,9,1],
+    ],
+    [
+      'two',
+      [8,2,4,1,6,3,5,7,9,1,5,6,8,9,7,4,2,3,3,7,9,2,4,5,8,6,1,6,9,5,3,8,1,2,4,7,2,8,1,4,7,6,9,3,5,4,3,7,5,2,9,1,8,6,7,1,8,9,3,2,6,5,4,5,6,2,7,1,4,3,9,8,9,4,3,6,5,8,7,1,2],
+    ],
+    [
+      'three',
+      [6,5,1,2,9,8,4,7,3,3,7,2,4,6,1,9,8,5,4,9,8,7,3,5,6,2,1,1,6,3,8,2,7,5,4,9,2,8,5,6,4,9,1,3,7,9,4,7,5,1,3,2,6,8,8,1,4,9,7,2,3,5,6,5,2,9,3,8,6,7,1,4,7,3,6,1,5,4,8,9,2],
+    ],
+  ];
+}

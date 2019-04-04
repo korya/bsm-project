@@ -1,5 +1,5 @@
 const {
-  emptyBoard,
+  createEmptyBoard,
   hasConflictsAt,
 } = require('./board');
 const { shuffleArray } = require('./utils');
@@ -37,5 +37,5 @@ const solveBoardAux = (board, currendIdx) => {
 const getAvailableNumbers = () => shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
 module.exports = {
-  genRandomBoard: () => solveBoard(emptyBoard()),
+  genRandomBoard: () => solveBoard(createEmptyBoard()),
 };

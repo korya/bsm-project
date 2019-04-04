@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { spawn } = require('child_process');
 
-const { isValidBoard } = require('../src/board');
+const { boardIsSolved } = require('../src/board');
 
 describe('GET /sudoku/board', () => {
   let server = null;
@@ -54,14 +54,14 @@ describe('GET /sudoku/board', () => {
       });
 
       test('board is valid', async () => {
-        expect(isValidBoard(res.data)).toEqual(true);
+        expect(boardIsSolved(res.data)).toEqual(true);
       });
 
       test('board is random', async () => {
         // A way to ensure the boards are indeed random. If the boards are really
         // random, the change of getting the same solution more than once is very
         // small. Not zero though.
-        expect(previousBoards).not.toContain(res.data);
+        expect(previousBoards).not.toContainEqual(res.data);
         previousBoards.push(res.data);
       });
     });
