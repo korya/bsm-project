@@ -9,6 +9,20 @@ follows:
 
 In the project directory, you can run:
 
+### Build
+
+```sh
+./build.sh
+```
+
+The commands builds the back-end and the front-end, run all the tests,
+then bundle it in a docker image `sudoku-ws:level-4`. If any of the commands
+fail, the whole script fails.
+
+```sh
+docker run –it -p 8000:80 –p 8080:8080 sudoku-ws:level-4
+```
+
 ### Run locally
 
 ```sh
@@ -24,14 +38,6 @@ requirement of Level 2 to use nginx as a reverse proxy. But I think it is OK,
 since this command is used to run the app in dev environment.
 The build command below, `npm run build`, builds and bundles the application
 as required by the spec.
-
-### Build
-
-```sh
-npm run build
-```
-
-Builds the app for production.
 
 ### Test 
 

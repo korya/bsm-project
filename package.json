@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "postinstall": "npm install --prefix server && npm install --prefix client",
     "build": "npm run build --prefix client",
     "start": "concurrently -k --names SERVER,CLIENT -c 'yellow,magenta' 'npm run start:server' 'npm run start:client'",
     "start:server": "npm run start --prefix server",
