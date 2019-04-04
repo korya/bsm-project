@@ -28,6 +28,32 @@ const boardIsSolved = board => {
   return true;
 };
 
+const boardIsSolveable = board => {
+  if (!Array.isArray(board) || board.length !== 81) {
+    return false;
+  }
+
+  for (let i = 0; i < 9; i++) {
+    if (segmentsHasDups(board, iterateRow(i))) {
+      return false;
+    }
+
+    if (segmentsHasDups(board, iterateCol(i))) {
+      return false;
+    }
+  }
+
+  for (let i = 0; i < 9; i += 3) {
+    for (let j = 0; j < 9; j += 3) {
+      if (segmentsHasDups(board, iterateBox([ i, j ]))) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
+
 const hasConflictsAt = (board, idx) => {
   const { row, col, box } = getPosForIdx(idx);
 
@@ -104,6 +130,7 @@ const getPosForIdx = idx => {
 module.exports = {
   createEmptyBoard,
   boardIsSolved,
+  boardIsSolveable,
   hasConflictsAt,
   getPosForIdx,
   segmentsHasDups,

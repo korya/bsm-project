@@ -1,5 +1,6 @@
 const express = require('express');
 const sudokuSolver = require('./naive-solver');
+const { createEmptyBoard } = require('./board');
 
 const app = express();
 const port = 8080;
@@ -9,7 +10,12 @@ app.get('/', (req, res) => {
 });
 
 app.get('/sudoku/board', (req, res) => {
-  res.json(sudokuSolver.genRandomBoard());
+  const { board } = req.query;
+
+  const solution = sudokuSolver.solveBoard(
+    board ? board.split('').map(Number) : createEmptyBoard(),
+  );
+  res.json(solution);
 });
 
 app.listen(port, () => {

@@ -1,6 +1,7 @@
 const {
   createEmptyBoard,
   boardIsSolved,
+  boardIsSolveable,
   segmentsHasDups,
   segmentIsSolved,
   getPosForIdx,
@@ -219,6 +220,121 @@ describe('boardIsSolved', () => {
 
     test.each(cases)('%s', val => {
       expect(boardIsSolved(val)).toEqual(false);
+    });
+  });
+});
+
+describe('boardIsSolveable', () => {
+  describe('solved', () => {
+    test.each(getValidBoards())('solved: %s', (name, board) => {
+      expect(boardIsSolveable(board)).toEqual(true);
+    });
+  });
+
+  describe('solveable', () => {
+    test('missing value', () => {
+      const b = getTrivialBoard();
+      expect(boardIsSolveable(b)).toEqual(true);
+      b[53] = 0;
+      expect(boardIsSolveable(b)).toEqual(true);
+    });
+
+    test('missing row', () => {
+      const b = getTrivialBoard();
+      expect(boardIsSolveable(b)).toEqual(true);
+      // clear 5th row
+      for (let idx = 36; idx < 45; idx++) {
+        b[idx] = 0;
+      }
+      expect(boardIsSolveable(b)).toEqual(true);
+    });
+
+    test('missing col', () => {
+      const b = getTrivialBoard();
+      expect(boardIsSolveable(b)).toEqual(true);
+      // clear 7th col
+      for (let idx = 6; idx < 81; idx += 9) {
+        b[idx] = 0;
+      }
+      expect(boardIsSolveable(b)).toEqual(true);
+    });
+
+    test('almost empty board', () => {
+      const b = createEmptyBoard();
+      b[80] = 1;
+      expect(boardIsSolveable(b)).toEqual(true);
+    });
+
+    test('empty board', () => {
+      const b = createEmptyBoard();
+      expect(boardIsSolveable(b)).toEqual(true);
+    });
+  });
+
+  describe('unsolveable', () => {
+    test('row dups', () => {
+      const b = getTrivialBoard();
+      expect(boardIsSolveable(b)).toEqual(true);
+      b[0] = b[1];
+      expect(boardIsSolveable(b)).toEqual(false);
+    });
+
+    test('col dups', () => {
+      const b = getTrivialBoard();
+      expect(boardIsSolveable(b)).toEqual(true);
+      b[80] = b[71];
+      expect(boardIsSolveable(b)).toEqual(false);
+    });
+
+    test('invalid box', () => {
+      const b = getTrivialBoard();
+      expect(boardIsSolveable(b)).toEqual(true);
+      // swap 3rd row and 4th row
+      for (let idx = 18; idx < 27; idx++) {
+        [b[idx], b[idx + 9]] = [b[idx + 9], b[idx]];
+      }
+      expect(boardIsSolveable(b)).toEqual(false);
+    });
+
+    test('sparse col dups', () => {
+      const b = createEmptyBoard();
+      b[8] = 3;
+      b[80] = 3;
+      expect(boardIsSolveable(b)).toEqual(false);
+    });
+
+    test('sparse row dups', () => {
+      const b = createEmptyBoard();
+      b[19] = 5;
+      b[26] = 5;
+      expect(boardIsSolveable(b)).toEqual(false);
+    });
+
+    test('sparse box dups', () => {
+      const b = createEmptyBoard();
+      b[10] = 2;
+      b[20] = 2;
+      expect(boardIsSolveable(b)).toEqual(false);
+    });
+  });
+
+  describe('bad input', () => {
+    const cases = [
+      undefined,
+      null,
+      '',
+      'string',
+      1,
+      2.3,
+      {},
+      { length: 81 },
+      [],
+      getTrivialBoard().slice(0, 75),
+      [...getTrivialBoard(), ...[0]],
+    ];
+
+    test.each(cases)('%s', val => {
+      expect(boardIsSolveable(val)).toEqual(false);
     });
   });
 });
